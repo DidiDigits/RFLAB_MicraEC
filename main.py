@@ -9,7 +9,19 @@ import traceback
 from tkinter import filedialog
 from calkit_utils import Parse_calkit
 
+def ask_port_sex(port_num):
+    while True:
+        sex = input(
+            f"\nIndica el sexo del conector del PUERTO {port_num} "
+            "(NO el del DUT) ('m' macho, 'f' hembra): "
+        ).strip().lower()
 
+        if sex in ('m', 'f'):
+            return sex
+
+        print("Entrada no válida. Usa 'm' o 'f'.")
+
+        
 def filter_standards_by_sex(standards, sex):
     """
     sex: 'm' o 'f'
@@ -68,6 +80,12 @@ def ask_user_to_select_load(loads):
 
         print("Entrada no válida. Intente nuevamente.")
 
+def select_load_for_port(standards, sex, port_num):
+    standards_sex = filter_standards_by_sex(standards, sex)
+    load_standards = get_load_standards(standards_sex)
+
+    print(f"\n=== Selección de LOAD para PUERTO {port_num} ===")
+    return ask_user_to_select_load(load_standards)
 
 
 def main():
@@ -76,16 +94,12 @@ def main():
     print("El programa corrige errores en mediciones de microondas utilizando la técnica SOLR y el archivo de definiciones de estandar proporcionado.")
 
 
-    #Ask connector sex tu user
-    while True:
-        print ("\nPor favor, indica el sexo de los conectores", "(NO eL sexo del DUT) ('m' para macho, 'f' para hembra): ")
-        sex = input().strip().lower()
-        if sex in ['m', 'f']:
-            break
-        else:
-            print("\nEntrada no válida. Por favor ingresa 'm' para macho o 'f' para hembra.")
-    
-    print(f"Seleccionaste: {'Macho' if sex == 'm' else 'Hembra'}")
+    #Ask port sex tu user
+    sex_p1 = ask_port_sex(1)
+    sex_p2 = ask_port_sex(2)
+
+    print(f"Puerto 1: {'Macho' if sex_p1 == 'm' else 'Hembra'}")
+    print(f"Puerto 2: {'Macho' if sex_p2 == 'm' else 'Hembra'}")
 
     # Open file explorer to select file calkit location
     print("\nSeleccione ruta y nombre del archivo .xkt con las definiciones de estandár en la ventana emergente")
@@ -116,14 +130,13 @@ def main():
         if not isinstance(standards, list):
             raise TypeError(f"expected list for 'standards', got {type(standards)!r}")
 
-        standards_sex = filter_standards_by_sex(standards, sex)
-        print(standards_sex)
+        load_p1 = select_load_for_port(standards, sex_p1, port_num=1)
+        load_p2 = select_load_for_port(standards, sex_p2, port_num=2)
 
-        load_standards = get_load_standards(standards_sex)
-        load_std = ask_user_to_select_load(load_standards)
+        print("\nResumen de LOADs seleccionados:")
+        print("Puerto 1:", load_p1.get("label"))
+        print("Puerto 2:", load_p2.get("label"))
 
-        print("\nLOAD seleccionado por el usuario:")
-        print(load_std)
         
     except Exception as e:
         print("Error al filtrar standards por sexo:", repr(e))
