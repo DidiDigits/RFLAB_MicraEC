@@ -4,7 +4,7 @@ import numpy as np
 def read_gamma_in(s2p_file):
     """
     Lee un archivo s2p y detecta automáticamente
-    el coeficiente de reflexión útil (S11 o S22).
+    el coeficiente de reflexión útil considerando que sólo se midio un puerto (S11 o S22).
 
     Returns
     -------
@@ -40,6 +40,11 @@ def read_gamma_in(s2p_file):
             "mag_std": np.std(mag),
             "energia": np.mean(mag**2),
         }
+
+        """
+        These metrics work together to distinguish a measured port (which should show significant, relatively stable reflection) 
+        from an unmeasured port (which would show mostly noise with low, erratic values).
+        """
 
         # Reflexión útil: grande y relativamente estable
         scores[key] = metricas[key]["energia"] / (metricas[key]["mag_std"] + 1e-12)
