@@ -1,3 +1,9 @@
+"""Gamma calculation utilities for calibration standards.
+
+This module provides functions to read gamma measurements from S2P files
+and compute theoretical Gamma_L for LOAD, OPEN, and SHORT standards.
+"""
+
 import skrf as rf
 import numpy as np
 
@@ -33,6 +39,7 @@ def read_gamma_in(s2p_file, puerto):
     gamma_in = S[:, idx, idx]
 
     return freq, gamma_in
+
 
 def compute_Gamma_L(freq, load_std, open_std, short_std):
     """
@@ -71,6 +78,7 @@ def compute_Gamma_L(freq, load_std, open_std, short_std):
 
     return out
 
+
 def gamma_load(freq, params):
     """
     Gamma_L para LOAD fijo
@@ -86,11 +94,12 @@ def gamma_open(freq, params):
     """
     Gamma_L para OPEN con modelo capacitivo
     """
+
     def to_float(val, default=0.0):
         if val is None:
             return default
         return float(val)
-    
+
     C0 = to_float(params.get('C0'))
     C1 = to_float(params.get('C1'))
     C2 = to_float(params.get('C2'))
@@ -98,7 +107,7 @@ def gamma_open(freq, params):
     Z0 = to_float(params.get('offset_z0'), 50.0)
 
     w = 2 * np.pi * freq
-    C = C0 + C1*freq + C2*freq**2 + C3*freq**3
+    C = C0 + C1 * freq + C2 * freq**2 + C3 * freq**3
 
     # Evitar división por cero
     Z = np.where(C != 0, 1 / (1j * w * C), 1e20)
@@ -109,11 +118,12 @@ def gamma_short(freq, params):
     """
     Gamma_L para SHORT con modelo inductivo
     """
+
     def to_float(val, default=0.0):
         if val is None:
             return default
         return float(val)
-    
+
     L0 = to_float(params.get('L0'))
     L1 = to_float(params.get('L1'))
     L2 = to_float(params.get('L2'))
@@ -121,8 +131,7 @@ def gamma_short(freq, params):
     Z0 = to_float(params.get('offset_z0'), 50.0)
 
     w = 2 * np.pi * freq
-    L = L0 + L1*freq + L2*freq**2 + L3*freq**3
+    L = L0 + L1 * freq + L2 * freq**2 + L3 * freq**3
 
     Z = 1j * w * L
     return (Z - Z0) / (Z + Z0)
-

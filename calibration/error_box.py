@@ -1,4 +1,11 @@
+"""Error box calculation using SOL (Short-Open-Load) calibration technique.
+
+This module implements the calculation of the 7-term error model parameters
+using Short, Open, and Load standards.
+"""
+
 import numpy as np
+
 
 def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
     """
@@ -33,26 +40,36 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
 
     for k in range(Nf):
         # y vector
-        y = np.array([
-            gamma_in_dict['short'][k],
-            gamma_in_dict['open'][k],
-            gamma_in_dict['load'][k]
-        ], dtype=complex)
+        y = np.array(
+            [
+                gamma_in_dict['short'][k],
+                gamma_in_dict['open'][k],
+                gamma_in_dict['load'][k],
+            ],
+            dtype=complex,
+        )
 
         # X matrix
-        X = np.array([
-            [1,
-             gamma_L_dict['short'][k],
-             gamma_L_dict['short'][k] * gamma_in_dict['short'][k]],
-
-            [1,
-             gamma_L_dict['open'][k],
-             gamma_L_dict['open'][k] * gamma_in_dict['open'][k]],
-
-            [1,
-             gamma_L_dict['load'][k],
-             gamma_L_dict['load'][k] * gamma_in_dict['load'][k]],
-        ], dtype=complex)
+        X = np.array(
+            [
+                [
+                    1,
+                    gamma_L_dict['short'][k],
+                    gamma_L_dict['short'][k] * gamma_in_dict['short'][k],
+                ],
+                [
+                    1,
+                    gamma_L_dict['open'][k],
+                    gamma_L_dict['open'][k] * gamma_in_dict['open'][k],
+                ],
+                [
+                    1,
+                    gamma_L_dict['load'][k],
+                    gamma_L_dict['load'][k] * gamma_in_dict['load'][k],
+                ],
+            ],
+            dtype=complex,
+        )
 
         # Solve 3x3 system
         a0, a1, a2 = np.linalg.solve(X, y)
@@ -63,7 +80,6 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
 
     return e00, e10e01, e11
 
-import numpy as np
 
 def build_T_XA(e00, e11, e10e01):
     """
@@ -94,11 +110,12 @@ def build_T_XA(e00, e11, e10e01):
     T_XA = np.zeros((Nf, 2, 2), dtype=complex)
 
     T_XA[:, 0, 0] = -Delta_e
-    T_XA[:, 0, 1] =  e00
+    T_XA[:, 0, 1] = e00
     T_XA[:, 1, 0] = -e11
-    T_XA[:, 1, 1] =  1.0
+    T_XA[:, 1, 1] = 1.0
 
     return T_XA
+
 
 def build_T_XB(e22, e33, e23e32):
     """
@@ -129,8 +146,8 @@ def build_T_XB(e22, e33, e23e32):
     T_XB = np.zeros((Nf, 2, 2), dtype=complex)
 
     T_XB[:, 0, 0] = -Delta_e
-    T_XB[:, 0, 1] =  e22
+    T_XB[:, 0, 1] = e22
     T_XB[:, 1, 0] = -e33
-    T_XB[:, 1, 1] =  1.0
+    T_XB[:, 1, 1] = 1.0
 
     return T_XB

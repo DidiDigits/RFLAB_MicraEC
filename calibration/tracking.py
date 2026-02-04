@@ -1,4 +1,12 @@
+"""Transmission tracking (7th error term) estimation.
+
+This module calculates the seventh calibration error parameter using 
+THRU measurements. SOL calibration provides 6 error terms, and this
+module completes the 7-term error model by estimating transmission tracking.
+"""
+
 import numpy as np
+
 
 def estimate_transmission_tracking(T_M, T_XA, T_XB):
     """
@@ -10,12 +18,7 @@ def estimate_transmission_tracking(T_M, T_XA, T_XB):
 
     alpha, S21_thru, branch = choose_alpha_automatic(alpha_p, alpha_m, X)
 
-    return {
-        'alpha': alpha,
-        'S21_thru': S21_thru,
-        'X': X,
-        'branch': branch
-    }
+    return {'alpha': alpha, 'S21_thru': S21_thru, 'X': X, 'branch': branch}
 
 
 def compute_alpha(T_M, T_XA, T_XB):
@@ -28,16 +31,17 @@ def compute_alpha(T_M, T_XA, T_XB):
     alpha_minus : np.ndarray (complex)
     """
 
-    det_TM  = np.linalg.det(T_M)
+    det_TM = np.linalg.det(T_M)
     det_TXA = np.linalg.det(T_XA)
     det_TXB = np.linalg.det(T_XB)
 
     ratio = det_TM / (det_TXA * det_TXB)
 
-    alpha_plus  = np.sqrt(ratio)
+    alpha_plus = np.sqrt(ratio)
     alpha_minus = -alpha_plus
 
     return alpha_plus, alpha_minus
+
 
 def compute_X_matrix(T_M, T_XA, T_XB):
     """
@@ -48,13 +52,10 @@ def compute_X_matrix(T_M, T_XA, T_XB):
     X = np.zeros_like(T_M, dtype=complex)
 
     for k in range(Nf):
-        X[k] = (
-            np.linalg.inv(T_XA[k]) @
-            T_M[k] @
-            np.linalg.inv(T_XB[k])
-        )
+        X[k] = np.linalg.inv(T_XA[k]) @ T_M[k] @ np.linalg.inv(T_XB[k])
 
     return X
+
 
 def compute_S21_thru(alpha, X):
     """
@@ -71,15 +72,17 @@ def compute_S21_thru(alpha, X):
     """
     return alpha / X[:, 1, 1]
 
+
 def s21_score(S21):
     mag = np.abs(S21)
     phase = np.unwrap(np.angle(S21))
 
-    score_mag   = np.mean((mag - 1.0)**2)       # cerca de 1
-    score_phase = np.mean(np.diff(phase)**2)    # suavidad
-    score_gain  = np.mean(np.maximum(mag - 1.2, 0)**2)  # penaliza ganancia
+    score_mag = np.mean((mag - 1.0) ** 2)  # cerca de 1
+    score_phase = np.mean(np.diff(phase) ** 2)  # suavidad
+    score_gain = np.mean(np.maximum(mag - 1.2, 0) ** 2)  # penaliza ganancia
 
-    return score_mag + score_phase + 10*score_gain
+    return score_mag + score_phase + 10 * score_gain
+
 
 def choose_alpha_automatic(alpha_p, alpha_m, X):
     S21_p = compute_S21_thru(alpha_p, X)
@@ -98,5 +101,3 @@ def choose_alpha_automatic(alpha_p, alpha_m, X):
         S21 = S21_m
 
     return alpha, S21, branch
-
-
