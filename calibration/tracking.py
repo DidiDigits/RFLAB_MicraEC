@@ -18,8 +18,15 @@ def estimate_transmission_tracking(T_M, T_XA, T_XB):
 
     alpha, S21_thru, branch = choose_alpha_automatic(alpha_p, alpha_m, X)
 
-    return {'alpha': alpha, 'S21_thru': S21_thru, 'X': X, 'branch': branch}
+    return {
+        'alpha': alpha,
+        'S21_thru': S21_thru,
+        'X': X,
+        'branch': branch
+    }
 
+
+import numpy as np
 
 def compute_alpha(T_M, T_XA, T_XB):
     """
@@ -31,16 +38,17 @@ def compute_alpha(T_M, T_XA, T_XB):
     alpha_minus : np.ndarray (complex)
     """
 
-    det_TM = np.linalg.det(T_M)
+    det_TM  = np.linalg.det(T_M)
     det_TXA = np.linalg.det(T_XA)
     det_TXB = np.linalg.det(T_XB)
 
     ratio = det_TM / (det_TXA * det_TXB)
 
-    alpha_plus = np.sqrt(ratio)
+    alpha_plus  = np.sqrt(ratio)
     alpha_minus = -alpha_plus
 
     return alpha_plus, alpha_minus
+
 
 
 def compute_X_matrix(T_M, T_XA, T_XB):
@@ -52,25 +60,13 @@ def compute_X_matrix(T_M, T_XA, T_XB):
     X = np.zeros_like(T_M, dtype=complex)
 
     for k in range(Nf):
-        X[k] = np.linalg.inv(T_XA[k]) @ T_M[k] @ np.linalg.inv(T_XB[k])
+        X[k] = (
+            np.linalg.inv(T_XA[k]) @
+            T_M[k] @
+            np.linalg.inv(T_XB[k])
+        )
 
     return X
-
-
-def compute_S21_thru(alpha, X):
-    """
-    Calcula S21 del THRU recíproco.
-
-    Parameters
-    ----------
-    alpha : np.ndarray (complex)
-    X : np.ndarray, shape (Nf,2,2)
-
-    Returns
-    -------
-    S21 : np.ndarray (complex)
-    """
-    return alpha / X[:, 1, 1]
 
 
 def s21_score(S21):
@@ -91,13 +87,23 @@ def choose_alpha_automatic(alpha_p, alpha_m, X):
     score_p = s21_score(S21_p)
     score_m = s21_score(S21_m)
 
-    if score_p < score_m:
-        alpha = alpha_p
-        branch = 'plus'
-        S21 = S21_p
+    if score_p <= score_m:
+        return alpha_p, S21_p, 'plus'
     else:
-        alpha = alpha_m
-        branch = 'minus'
-        S21 = S21_m
+        return alpha_m, S21_m, 'minus'
 
-    return alpha, S21, branch
+
+def compute_S21_thru(alpha, X):
+    """
+    Calcula S21 del THRU recíproco.
+
+    Parameters
+    ----------
+    alpha : np.ndarray (complex)
+    X : np.ndarray, shape (Nf,2,2)
+
+    Returns
+    -------
+    S21 : np.ndarray (complex)
+    """
+    return alpha / X[:, 1, 1]

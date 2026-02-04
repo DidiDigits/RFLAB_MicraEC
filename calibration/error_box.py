@@ -12,11 +12,6 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
     Estima e00(f), e10e01(f), e11(f) punto a punto en frecuencia
     usando estándares SHORT, OPEN y LOAD.
 
-    Forward Errors description:
-    e00 Directivity: Leakage between the source and receiver within the coupler.
-    e11 Source Match: Mismatch between the VNA source port and the reference impedance.
-    e10e01 Reflection Tracking: Frequency response difference between the test and reference paths.
-
     Parameters
     ----------
     gamma_in_dict : dict
@@ -40,36 +35,26 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
 
     for k in range(Nf):
         # y vector
-        y = np.array(
-            [
-                gamma_in_dict['short'][k],
-                gamma_in_dict['open'][k],
-                gamma_in_dict['load'][k],
-            ],
-            dtype=complex,
-        )
+        y = np.array([
+            gamma_in_dict['short'][k],
+            gamma_in_dict['open'][k],
+            gamma_in_dict['load'][k]
+        ], dtype=complex)
 
         # X matrix
-        X = np.array(
-            [
-                [
-                    1,
-                    gamma_L_dict['short'][k],
-                    gamma_L_dict['short'][k] * gamma_in_dict['short'][k],
-                ],
-                [
-                    1,
-                    gamma_L_dict['open'][k],
-                    gamma_L_dict['open'][k] * gamma_in_dict['open'][k],
-                ],
-                [
-                    1,
-                    gamma_L_dict['load'][k],
-                    gamma_L_dict['load'][k] * gamma_in_dict['load'][k],
-                ],
-            ],
-            dtype=complex,
-        )
+        X = np.array([
+            [1,
+             gamma_L_dict['short'][k],
+             gamma_L_dict['short'][k] * gamma_in_dict['short'][k]],
+
+            [1,
+             gamma_L_dict['open'][k],
+             gamma_L_dict['open'][k] * gamma_in_dict['open'][k]],
+
+            [1,
+             gamma_L_dict['load'][k],
+             gamma_L_dict['load'][k] * gamma_in_dict['load'][k]],
+        ], dtype=complex)
 
         # Solve 3x3 system
         a0, a1, a2 = np.linalg.solve(X, y)
@@ -79,6 +64,7 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
         e10e01[k] = a1 + a0 * a2
 
     return e00, e10e01, e11
+
 
 
 def build_T_XA(e00, e11, e10e01):

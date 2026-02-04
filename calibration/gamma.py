@@ -11,6 +11,7 @@ import numpy as np
 def read_gamma_in(s2p_file, puerto):
     """
     Lee un archivo s2p y devuelve Gamma_in del puerto indicado.
+    gamma_in es el gamma medido para los tres estándares de calibración (SHORT, OPEN, LOAD).
 
     Parameters
     ----------
@@ -24,7 +25,7 @@ def read_gamma_in(s2p_file, puerto):
     freq : np.ndarray
         Vector de frecuencia (Hz)
     gamma_in : np.ndarray
-        Coeficiente de reflexión complejo
+        Coeficiente de reflexión complejo medido
     """
 
     if puerto not in (1, 2):

@@ -9,6 +9,11 @@ import skrf as rf
 import matplotlib.pyplot as plt
 
 
+import numpy as np
+import skrf as rf
+import matplotlib.pyplot as plt
+
+
 def compare_thru_S21(freq_est, S21_est, s2p_ref):
     """
     Compara S21 estimado del THRU (SOLR) con un THRU medido (PNA-X).
@@ -29,8 +34,14 @@ def compare_thru_S21(freq_est, S21_est, s2p_ref):
     S21_ref = ntwk_ref.s[:, 1, 0]  # S21
 
     # Interpolar referencia al eje de frecuencia estimado (por seguridad)
-    S21_ref_i = np.interp(freq_est, freq_ref, S21_ref.real) + 1j * np.interp(
-        freq_est, freq_ref, S21_ref.imag
+    S21_ref_i = np.interp(
+        freq_est,
+        freq_ref,
+        S21_ref.real
+    ) + 1j * np.interp(
+        freq_est,
+        freq_ref,
+        S21_ref.imag
     )
 
     # Magnitud y fase

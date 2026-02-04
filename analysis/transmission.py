@@ -9,7 +9,9 @@ from ui.file_dialogs import select_s2p
 
 
 def read_thru_T_matrix(s2p_file):
-    """Lee un archivo THRU (.s2p) y devuelve la matriz T (ABCD).
+    """
+    Lee un archivo THRU (.s2p) y devuelve la matriz T (ABCD)
+    por frecuencia.
 
     Parameters
     ----------
@@ -20,11 +22,19 @@ def read_thru_T_matrix(s2p_file):
     -------
     freq : np.ndarray
         Vector de frecuencia (Hz)
-    T : np.ndarray
-        Matriz T (ABCD), shape (Nf, 2, 2)
+    TM : np.ndarray
+        Matriz T por frecuencia, shape (Nf, 2, 2)
     """
+
     ntwk = rf.Network(s2p_file)
-    return ntwk.f, ntwk.a
+
+    freq = ntwk.f  # Hz
+
+    # Convertir de S a T (ABCD)
+    # skrf usa 'a' para ABCD
+    T = ntwk.a  # shape (Nf, 2, 2)
+
+    return freq, T
 
 
 def perform_transmission_analysis(freq, error_params_p1, error_params_p2):
