@@ -19,7 +19,7 @@ def validate_frequency_vectors(freq_p1, freq_p2):
         )
 
 
-def calculate_error_parameters(freq, datos_p1, datos_p2, standards_p1, standards_p2):
+def calculate_error_parameters(freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2):
     """Calculate SOL error parameters for both ports.
 
     Returns
@@ -36,14 +36,14 @@ def calculate_error_parameters(freq, datos_p1, datos_p2, standards_p1, standards
         freq, standards_p2['load'], standards_p2['open'], standards_p2['short']
     )
 
-    print("Calculando parámetros de error (SOLR)...")
+    print("Calculando parámetros de error (SOL)...")
 
     # Puerto 1
     e00_p1, e10e01_p1, e11_p1 = estimate_error_box_SOL(
         {
-            'short': datos_p1['gamma_short'],
-            'open': datos_p1['gamma_open'],
-            'load': datos_p1['gamma_load'],
+            'short': gamma_in_p1['gamma_short'],
+            'open': gamma_in_p1['gamma_open'],
+            'load': gamma_in_p1['gamma_load'],
         },
         {
             'short': gamma_l_p1['short'],
@@ -53,11 +53,11 @@ def calculate_error_parameters(freq, datos_p1, datos_p2, standards_p1, standards
     )
 
     # Puerto 2
-    e33_p2, e23e32_p2, e22_p2 = estimate_error_box_SOL(
+    e00_p2, e10e01_p2, e11_p2 = estimate_error_box_SOL(
         {
-            'short': datos_p2['gamma_short'],
-            'open': datos_p2['gamma_open'],
-            'load': datos_p2['gamma_load'],
+            'short': gamma_in_p2['gamma_short'],
+            'open': gamma_in_p2['gamma_open'],
+            'load': gamma_in_p2['gamma_load'],
         },
         {
             'short': gamma_l_p2['short'],
@@ -66,11 +66,16 @@ def calculate_error_parameters(freq, datos_p1, datos_p2, standards_p1, standards
         },
     )
 
-    print("\n=== Parámetros de Error - Puerto 1 ===")
-    print(f"e00: {e00_p1}\ne10*e01: {e10e01_p1}\ne11: {e11_p1}")
+    # Reinterpretación física de errores del puerto 2
+    rev_p2 = map_forward_to_reverse_errors(
+        e00_p2,
+        e10e01_p2,
+        e11_p2
+    )
 
-    print("\n=== Parámetros de Error - Puerto 2 ===")
-    print(f"e33: {e33_p2}\ne23*e32: {e23e32_p2}\ne22: {e22_p2}")
+    e22_p2    = rev_p2['e22']
+    e33_p2    = rev_p2['e33']
+    e23e32_p2 = rev_p2['e23e32']
 
     return {
         'e00': e00_p1,
@@ -78,8 +83,18 @@ def calculate_error_parameters(freq, datos_p1, datos_p2, standards_p1, standards
         'e11': e11_p1,
         'T_XA': build_T_XA(e00_p1, e11_p1, e10e01_p1),
     }, {
-        'e33': e33_p2,
-        'e23e32': e23e32_p2,
         'e22': e22_p2,
+        'e23e32': e23e32_p2,
+        'e33': e33_p2,
         'T_XB': build_T_XB(e22_p2, e33_p2, e23e32_p2),
+    }
+
+def map_forward_to_reverse_errors(e00, e10e01, e11):
+    """
+    Convierte errores SOL forward al significado físico del puerto 2.
+    """
+    return {
+        'e22': e11,
+        'e33': e00,
+        'e23e32': e10e01
     }

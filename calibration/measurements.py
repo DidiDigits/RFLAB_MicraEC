@@ -33,7 +33,7 @@ def load_port_Gamma_in(port_num):
     standards_list = ['SHORT', 'OPEN', 'LOAD']
 
     while True:
-        datos = {}
+        datos_Gamma_in = {}
 
         try:
             for std in standards_list:
@@ -42,15 +42,15 @@ def load_port_Gamma_in(port_num):
 
                 # Leer datos
                 freq, gamma = read_gamma_in(archivo, port_num)
-                datos[std] = {'freq': freq, 'gamma': gamma, 'puerto': port_num}
+                datos_Gamma_in[std] = {'freq': freq, 'gamma': gamma, 'puerto': port_num}
         except RuntimeError as e:
             print(f"Error: {e}")
             continue
 
         # Validar que todos tengan el mismo vector de frecuencia
-        freq_short = datos['SHORT']['freq']
-        freq_open = datos['OPEN']['freq']
-        freq_load = datos['LOAD']['freq']
+        freq_short = datos_Gamma_in['SHORT']['freq']
+        freq_open = datos_Gamma_in['OPEN']['freq']
+        freq_load = datos_Gamma_in['LOAD']['freq']
 
         if not (
             np.allclose(freq_short, freq_open, rtol=1e-9)
@@ -63,9 +63,9 @@ def load_port_Gamma_in(port_num):
             continue
 
         # Validar que todos fueron medidos desde el mismo puerto
-        puerto_short = datos['SHORT']['puerto']
-        puerto_open = datos['OPEN']['puerto']
-        puerto_load = datos['LOAD']['puerto']
+        puerto_short = datos_Gamma_in['SHORT']['puerto']
+        puerto_open = datos_Gamma_in['OPEN']['puerto']
+        puerto_load = datos_Gamma_in['LOAD']['puerto']
 
         if not (puerto_short == puerto_open == puerto_load):
             print("\n ERROR: Los estándares no fueron medidos desde el mismo puerto.")
@@ -84,8 +84,8 @@ def load_port_Gamma_in(port_num):
 
         return {
             'freq': freq_short,
-            'gamma_short': datos['SHORT']['gamma'],
-            'gamma_open': datos['OPEN']['gamma'],
-            'gamma_load': datos['LOAD']['gamma'],
+            'gamma_short': datos_Gamma_in['SHORT']['gamma'],
+            'gamma_open': datos_Gamma_in['OPEN']['gamma'],
+            'gamma_load': datos_Gamma_in['LOAD']['gamma'],
             'puerto_detectado': puerto_short,
         }

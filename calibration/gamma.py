@@ -10,7 +10,7 @@ import numpy as np
 
 def read_gamma_in(s2p_file, puerto):
     """
-    Lee un archivo s2p y devuelve Gamma_in del puerto indicado.
+    Lee un archivo s2p y devuelve el párametro S11 o S22 (Gamma_in) dependiendo del puerto indicado.
     gamma_in es el gamma medido para los tres estándares de calibración (SHORT, OPEN, LOAD).
 
     Parameters

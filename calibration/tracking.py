@@ -5,28 +5,61 @@ THRU measurements. SOL calibration provides 6 error terms, and this
 module completes the 7-term error model by estimating transmission tracking.
 """
 
+from math import tau
 import numpy as np
+import matplotlib.pyplot as plt
 
 
-def estimate_transmission_tracking(T_M, T_XA, T_XB):
+def estimate_transmission_tracking(T_M, T_XA, T_XB, freq):
     """
     Estima transmisión tracking y selecciona automáticamente la rama física.
     """
 
     alpha_p, alpha_m = compute_alpha(T_M, T_XA, T_XB)
+    
+    # Debug Plot alpha
+    #from debug.debug_utils import plot_alpha
+    #plot_alpha(freq, alpha_m)
+    #plot_alpha(freq, alpha_p)
+    
     X = compute_X_matrix(T_M, T_XA, T_XB)
+    
+    #Debug Plot X
+    #from debug.debug_utils import plot_X
+    #plot_X(freq, X)
 
-    alpha, S21_thru, branch = choose_alpha_automatic(alpha_p, alpha_m, X)
+    # Calcular S21 para ambas ramas
+    S21_p = alpha_p / X[:, 1, 1]
+    S21_m = alpha_m / X[:, 1, 1]
 
-    return {
-        'alpha': alpha,
-        'S21_thru': S21_thru,
-        'X': X,
-        'branch': branch
-    }
+    #Debug Plot S21
+    from debug.debug_utils import plot_S21n
+    plot_S21n(freq, S21_p)
+    plot_S21n(freq, S21_m)
+
+    from transmission import compute_group_delay
+
+    gd_p = compute_group_delay(freq, S21_p)
+    gd_m = compute_group_delay(freq, S21_m)
+
+    print("Group Delay (p) statistics:")
+    print(f"Mean     : {np.mean(gd_p)*1e12:.3f} ps")
+    print(f"Median   : {np.median(gd_p)*1e12:.3f} ps")
+    print(f"Min      : {np.min(gd_p)*1e12:.3f} ps")
+    print(f"Max      : {np.max(gd_p)*1e12:.3f} ps")
+    print(f"Std Dev  : {np.std(gd_p)*1e12:.3f} ps")
+
+    print("Group Delay (m) statistics:")
+    print(f"Mean     : {np.mean(gd_m)*1e12:.3f} ps")
+    print(f"Median   : {np.median(gd_m)*1e12:.3f} ps")
+    print(f"Min      : {np.min(gd_m)*1e12:.3f} ps")
+    print(f"Max      : {np.max(gd_m)*1e12:.3f} ps")
+    print(f"Std Dev  : {np.std(gd_m)*1e12:.3f} ps")
 
 
-import numpy as np
+
+
+
 
 def compute_alpha(T_M, T_XA, T_XB):
     """
@@ -47,8 +80,10 @@ def compute_alpha(T_M, T_XA, T_XB):
     alpha_plus  = np.sqrt(ratio)
     alpha_minus = -alpha_plus
 
-    return alpha_plus, alpha_minus
+    print(alpha_plus)
+    print(alpha_minus)
 
+    return alpha_plus, alpha_minus
 
 
 def compute_X_matrix(T_M, T_XA, T_XB):
@@ -65,45 +100,5 @@ def compute_X_matrix(T_M, T_XA, T_XB):
             T_M[k] @
             np.linalg.inv(T_XB[k])
         )
-
     return X
 
-
-def s21_score(S21):
-    mag = np.abs(S21)
-    phase = np.unwrap(np.angle(S21))
-
-    score_mag = np.mean((mag - 1.0) ** 2)  # cerca de 1
-    score_phase = np.mean(np.diff(phase) ** 2)  # suavidad
-    score_gain = np.mean(np.maximum(mag - 1.2, 0) ** 2)  # penaliza ganancia
-
-    return score_mag + score_phase + 10 * score_gain
-
-
-def choose_alpha_automatic(alpha_p, alpha_m, X):
-    S21_p = compute_S21_thru(alpha_p, X)
-    S21_m = compute_S21_thru(alpha_m, X)
-
-    score_p = s21_score(S21_p)
-    score_m = s21_score(S21_m)
-
-    if score_p <= score_m:
-        return alpha_p, S21_p, 'plus'
-    else:
-        return alpha_m, S21_m, 'minus'
-
-
-def compute_S21_thru(alpha, X):
-    """
-    Calcula S21 del THRU recíproco.
-
-    Parameters
-    ----------
-    alpha : np.ndarray (complex)
-    X : np.ndarray, shape (Nf,2,2)
-
-    Returns
-    -------
-    S21 : np.ndarray (complex)
-    """
-    return alpha / X[:, 1, 1]

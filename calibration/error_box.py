@@ -90,12 +90,12 @@ def build_T_XA(e00, e11, e10e01):
     if not (e00.shape == e11.shape == e10e01.shape):
         raise ValueError("Todos los términos de error deben tener la misma longitud")
 
-    Delta_e = e00 * e11 - e10e01
+    Delta_ea = e00 * e11 - e10e01
 
     Nf = e00.size
     T_XA = np.zeros((Nf, 2, 2), dtype=complex)
 
-    T_XA[:, 0, 0] = -Delta_e
+    T_XA[:, 0, 0] = -Delta_ea
     T_XA[:, 0, 1] = e00
     T_XA[:, 1, 0] = -e11
     T_XA[:, 1, 1] = 1.0
@@ -104,21 +104,6 @@ def build_T_XA(e00, e11, e10e01):
 
 
 def build_T_XB(e22, e33, e23e32):
-    """
-    Construye la matriz T_XB(f) para cada frecuencia.
-
-    Parameters
-    ----------
-    e22 : np.ndarray (complex)
-    e33 : np.ndarray (complex)
-    e23e32 : np.ndarray (complex)
-
-    Returns
-    -------
-    T_XB : np.ndarray
-        shape (Nf, 2, 2)
-    """
-
     e22 = np.asarray(e22, dtype=complex)
     e33 = np.asarray(e33, dtype=complex)
     e23e32 = np.asarray(e23e32, dtype=complex)
@@ -126,12 +111,12 @@ def build_T_XB(e22, e33, e23e32):
     if not (e22.shape == e33.shape == e23e32.shape):
         raise ValueError("Todos los términos de error deben tener la misma longitud")
 
-    Delta_e = e22 * e33 - e23e32
+    Delta_eb = e22 * e33 - e23e32
 
     Nf = e22.size
     T_XB = np.zeros((Nf, 2, 2), dtype=complex)
 
-    T_XB[:, 0, 0] = -Delta_e
+    T_XB[:, 0, 0] = -Delta_eb
     T_XB[:, 0, 1] = e22
     T_XB[:, 1, 0] = -e33
     T_XB[:, 1, 1] = 1.0

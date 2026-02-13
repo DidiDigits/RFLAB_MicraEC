@@ -1,0 +1,175 @@
+4/Febrero/26
+
+Se imprimieron los standards estandares en el paso #2, en el proceso de debug
+cal_kit_raw, standards = load_and_validate_calkit()
+print(standards)
+
+Kit: 85052D
+Descripción: 3.5 mm Economy Calibration Kit
+
+[{'label': 'BROADBAND LOAD -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '3', 'type': 'LOAD', 'gender': 'm', 'model': {'kind': 'fixed_load', 'params': {'offset_delay': '0', 'offset_loss': '0', 'offset_z0': '50', 'ZL': 50.0}}}, 
+
+{'label': 'OPEN -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '2', 'type': 'OPEN', 'gender': 'm', 'model': {'kind': 'open', 'params': {'C0': '4.9433E-14', 'C1': '-3.1013E-25', 'C2': '2.3168E-35', 'C3': '-1.5966E-46', 'offset_delay': '2.9243E-11', 'offset_loss': '2200000000', 'offset_z0': '50'}}}, 
+
+{'label': 'SHORT -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '1', 'type': 'SHORT', 'gender': 'm', 'model': {'kind': 'short', 'params': {'L0': '2.0765E-12', 'L1': '-1.0854E-22', 'L2': '2.1705E-33', 'L3': '-1E-44', 'offset_delay': '3.1785E-11', 'offset_loss': '2360000000', 'offset_z0': '50'}}}, 
+
+{'label': 'BROADBAND LOAD -F-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '14', 'type': 'LOAD', 'gender': 'f', 'model': {'kind': 'fixed_load', 'params': {'offset_delay': '0', 'offset_loss': '0', 'offset_z0': '50', 'ZL': 50.0}}}, 
+
+{'label': 'OPEN -F-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '15', 'type': 'OPEN', 'gender': 'f', 'model': {'kind': 'open', 'params': {'C0': '4.9433E-14', 'C1': '-3.1013E-25', 'C2': '2.3168E-35', 'C3': '-1.5966E-46', 'offset_delay': '2.9243E-11', 'offset_loss': '2200000000', 'offset_z0': '50'}}}, 
+
+{'label': 'SHORT -F-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '7', 'type': 'SHORT', 'gender': 'f', 'model': {'kind': 'short', 'params': {'L0': '2.0765E-12', 'L1': '-1.0854E-22', 'L2': '2.1705E-33', 'L3': '-1E-44', 'offset_delay': '3.1785E-11', 'offset_loss': '2360000000', 'offset_z0': '50'}}}, 
+
+{'label': 'THRU', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '4', 'type': 'THRU', 'gender': None, 'model': {}}]
+
+
+Se imprimieron los estandares seleccionados para cada puerto Paso #3
+# Step 3: Select standards for both ports
+standards_p1 = select_standards_for_port(standards, sex_p1, port_num=1)
+print(standards_p1)
+standards_p2 = select_standards_for_port(standards, sex_p2, port_num=2)
+print(standards_p2)
+
+
+Puerto 1: LOAD=BROADBAND LOAD -M-, OPEN=OPEN -M-, SHORT=SHORT -M-
+{'load': 
+{'label': 'BROADBAND LOAD -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '3', 'type': 'LOAD', 'gender': 'm', 'model': {'kind': 'fixed_load', 'params': {'offset_delay': '0', 'offset_loss': '0', 'offset_z0': '50', 'ZL': 50.0}}}, 
+'open':
+{'label': 'OPEN -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '2', 'type': 'OPEN', 'gender': 'm', 'model': {'kind': 'open', 'params': {'C0': '4.9433E-14', 'C1': '-3.1013E-25', 'C2': '2.3168E-35', 'C3': '-1.5966E-46', 'offset_delay': '2.9243E-11', 'offset_loss': '2200000000', 'offset_z0': '50'}}}, 
+'short': 
+{'label': 'SHORT -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '1', 'type': 'SHORT', 'gender': 'm', 'model': {'kind': 'short', 'params': {'L0': '2.0765E-12', 'L1': '-1.0854E-22', 'L2': '2.1705E-33', 'L3': '-1E-44', 'offset_delay': '3.1785E-11', 'offset_loss': '2360000000', 'offset_z0': '50'}}}}
+
+Puerto 2: LOAD=BROADBAND LOAD -M-, OPEN=OPEN -M-, SHORT=SHORT -M-
+{'load': 
+{'label': 'BROADBAND LOAD -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '3', 'type': 'LOAD', 'gender': 'm', 'model': {'kind': 'fixed_load', 'params': {'offset_delay': '0', 'offset_loss': '0', 'offset_z0': '50', 'ZL': 50.0}}}, 
+'open': {'label': 'OPEN -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '2', 'type': 'OPEN', 'gender': 'm', 'model': {'kind': 'open', 'params': {'C0': '4.9433E-14', 'C1': '-3.1013E-25', 'C2': '2.3168E-35', 'C3': '-1.5966E-46', 'offset_delay': '2.9243E-11', 'offset_loss': '2200000000', 'offset_z0': '50'}}}, 
+'short': {'label': 'SHORT -M-', 'description': None, 'port_connector': None, 'freq_min': '0', 'freq_max': '999000000000', 'standard_number': '1', 'type': 'SHORT', 'gender': 'm', 'model': {'kind': 'short', 'params': {'L0': '2.0765E-12', 'L1': '-1.0854E-22', 'L2': '2.1705E-33', 'L3': '-1E-44', 'offset_delay': '3.1785E-11', 'offset_loss': '2360000000', 'offset_z0': '50'}}}}
+
+Se imprimieron los primeros datos de gammas_in cargados en el Paso #4
+Se validaron contra los datos RAW en formato s2p
+
+✓ Archivos del Puerto 1 validados correctamente (puerto detectado: 1)
+
+{'freq': array([1.500000e+06, 1.717812e+06, 1.935625e+06, ..., 3.495644e+08,
+       3.497822e+08, 3.500000e+08], shape=(1601,)), 
+
+'gamma_short': array([-1.011169 +0.01733398j, -1.013    +0.01867676j,
+       -1.01416  +0.01513672j, ..., -0.7868042-0.5335083j ,
+       -0.7861328-0.5336914j , -0.7856445-0.5348511j ], shape=(1601,)), 
+
+'gamma_open': array([0.9770508-0.01391602j, 0.9766235-0.01678467j,
+       0.9769287-0.01318359j, ..., 0.7879639+0.680481j  ,
+       0.7875977+0.6815796j , 0.788208 +0.6815796j ], shape=(1601,)), 
+
+'gamma_load': array([ 0.00376177-0.00272799j,  0.00311494-0.00342488j,
+        0.00256133-0.00366449j, ..., -0.00368404+0.01548576j,
+       -0.00370979+0.01553535j, -0.00373554+0.01549053j], shape=(1601,)), 'puerto_detectado': 1}
+
+✓ Archivos del Puerto 2 validados correctamente (puerto detectado: 2)
+
+{'freq': array([1.500000e+06, 1.717812e+06, 1.935625e+06, ..., 3.495644e+08,
+       3.497822e+08, 3.500000e+08], shape=(1601,)), 
+
+'gamma_short': array([-1.002197 +0.03112793j, -1.002686 +0.02728271j,
+       -1.003418 +0.02532959j, ..., -0.7514038-0.5973511j ,
+       -0.7504272-0.5970459j , -0.7495117-0.5985718j ], shape=(1601,)), 
+
+'gamma_open': array([0.9768066-0.02172852j, 0.9765015-0.02001953j,
+       0.9755859-0.01831055j, ..., 0.7590942+0.7201538j ,
+       0.7590942+0.7213745j , 0.7595825+0.7217407j ], shape=(1601,)), 
+
+'gamma_load': array([ 5.295277e-03-0.00158834j,  4.713535e-03-0.00251007j,
+        4.027128e-03-0.00291872j, ..., -6.723404e-05+0.01076889j,
+       -1.420975e-04+0.01076078j, -8.153915e-05+0.01076412j],
+      shape=(1601,)), 'puerto_detectado': 2}
+
+En el paso 6 se calculan los terminus de error para SOL
+
+Se revisó lo siguiente:
+Gamma_L calculado con las definiciones del kit y los modelos para Load, Short y Open. Los valores tienen sentido físico.
+
+Calculando estándares Gamma_L teóricos...
+{'load': array([0.+0.j, 0.+0.j, 0.+0.j, ..., 0.+0.j, 0.+0.j, 0.+0.j], shape=(1601,)), 
+
+'open': array([1.        -4.65890665e-05j, 1.        -5.33540987e-05j,
+       1.        -6.01191436e-05j, ..., 0.99994131-1.08338462e-02j,
+       0.99994124-1.08405819e-02j, 0.99994117-1.08473176e-02j],
+      shape=(1601,)), 
+
+'short': array([-1.        +7.82760681e-07j, -1.        +8.96413588e-07j,
+       -1.        +1.01006443e-06j, ..., -0.99999998+1.79121037e-04j,
+       -0.99999998+1.79230591e-04j, -0.99999998+1.79340143e-04j],
+      shape=(1601,))}
+
+{'load': array([0.+0.j, 0.+0.j, 0.+0.j, ..., 0.+0.j, 0.+0.j, 0.+0.j], shape=(1601,)), 
+
+'open': array([1.        -4.65890665e-05j, 1.        -5.33540987e-05j,
+       1.        -6.01191436e-05j, ..., 0.99994131-1.08338462e-02j,
+       0.99994124-1.08405819e-02j, 0.99994117-1.08473176e-02j],
+      shape=(1601,)), 
+
+'short': array([-1.        +7.82760681e-07j, -1.        +8.96413588e-07j,
+       -1.        +1.01006443e-06j, ..., -0.99999998+1.79121037e-04j,
+       -0.99999998+1.79230591e-04j, -0.99999998+1.79340143e-04j],
+      shape=(1601,))}
+
+Se reviso que las matrices de error tuvieran consistencia
+
+Calculando parámetros de error (SOL)...
+{'e00': array([ 0.00376177-0.00272799j,  0.00311494-0.00342488j,
+        0.00256133-0.00366449j, ..., -0.00368404+0.01548576j,
+       -0.00370979+0.01553535j, -0.00373554+0.01549053j], shape=(1601,)), 'e10e01': array([0.99369117-0.01542219j, 0.99437204-0.01752439j,
+       0.99511322-0.01393843j, ..., 0.78639357+0.60887687j,
+       0.78588909+0.60946802j, 0.78585099+0.61004278j], shape=(1601,)), 'e11': array([-0.02100929+0.00415545j, -0.02148589+0.00403642j,
+       -0.02133389+0.00438729j, ...,  0.03874483+0.04912639j,
+        0.03917342+0.04931597j,  0.03930878+0.04850651j], shape=(1601,)), 'T_XA': array([[[ 0.99375887-0.01549514j,  0.00376177-0.00272799j],
+        [ 0.02100929-0.00415545j,  1.        +0.j        ]],
+
+       [[ 0.99442514-0.01761055j,  0.00311494-0.00342488j],
+        [ 0.02148589-0.00403642j,  1.        +0.j        ]],
+
+       [[ 0.99515179-0.01402785j,  0.00256133-0.00366449j],
+        [ 0.02133389-0.00438729j,  1.        +0.j        ]],
+
+       ...,
+
+       [[ 0.78729707+0.60845786j, -0.00368404+0.01548576j],
+        [-0.03874483-0.04912639j,  1.        +0.j        ]],
+
+       [[ 0.78680055+0.6090424j , -0.00370979+0.01553535j],
+        [-0.03917342-0.04931597j,  1.        +0.j        ]],
+
+       [[ 0.78674922+0.60961506j, -0.00373554+0.01549053j],
+        [-0.03930878-0.04850651j,  1.        +0.j        ]]],
+      shape=(1601, 2, 2))}
+{'e22': array([-0.01833813+0.00588745j, -0.01813115+0.00579865j,
+       -0.01826811+0.0061226j , ...,  0.03592573+0.04103351j,
+        0.03687992+0.04123038j,  0.03699643+0.04032744j], shape=(1601,)), 'e23e32': array([0.98920939-0.02618397j, 0.989307  -0.02341014j,
+       0.989214  -0.02156307j, ..., 0.75326664+0.66093169j,
+       0.75278651+0.66129155j, 0.75247416+0.66223617j], shape=(1601,)), 'e33': array([ 5.295277e-03-0.00158834j,  4.713535e-03-0.00251007j,
+        4.027128e-03-0.00291872j, ..., -6.723404e-05+0.01076889j,
+       -1.420975e-04+0.01076078j, -8.153915e-05+0.01076412j],
+      shape=(1601,)), 'T_XB': array([[[ 9.89297144e-01-0.02624427j, -1.83381334e-02+0.00588745j],
+        [-5.29527700e-03+0.00158834j,  1.00000000e+00+0.j        ]],
+
+       [[ 9.89377910e-01-0.02348298j, -1.81311539e-02+0.00579865j],
+        [-4.71353500e-03+0.00251007j,  1.00000000e+00+0.j        ]],
+
+       [[ 9.89269694e-01-0.02164104j, -1.82681055e-02+0.0061226j ],
+        [-4.02712800e-03+0.00291872j,  1.00000000e+00+0.j        ]],
+
+       ...,
+
+       [[ 7.53710941e-01+0.66054757j,  3.59257262e-02+0.04103351j],
+        [ 6.72340400e-05-0.01076889j,  1.00000000e+00+0.j        ]],
+
+       [[ 7.53235424e-01+0.66090055j,  3.68799250e-02+0.04123038j],
+        [ 1.42097500e-04-0.01076078j,  1.00000000e+00+0.j        ]],
+
+       [[ 7.52911265e-01+0.66184122j,  3.69964341e-02+0.04032744j],
+        [ 8.15391500e-05-0.01076412j,  1.00000000e+00+0.j        ]]],
+      shape=(1601, 2, 2))}
+
+
+
+
+
