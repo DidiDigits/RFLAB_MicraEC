@@ -6,6 +6,8 @@ and compute theoretical Gamma_L for LOAD, OPEN, and SHORT standards.
 
 import skrf as rf
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 
 def read_gamma_in(s2p_file, puerto):
@@ -36,6 +38,16 @@ def read_gamma_in(s2p_file, puerto):
     freq = ntwk.f
     S = ntwk.s
 
+    #Debug
+    plt.figure()
+    plt.plot(freq, 20 * np.log10(np.abs(S[:, puerto-1, puerto-1])), label=f"S{puerto}{puerto} medido")
+    plt.title(f"Medición S{puerto}{puerto} (Gamma_in)")
+    plt.xlabel("Frecuencia (Hz)")
+    plt.ylabel("Magnitud (dB)")
+    plt.grid()  
+    # Pause to view the plots
+    input("\nPresione Enter para continuar...")
+
     idx = puerto - 1
     gamma_in = S[:, idx, idx]
 
@@ -63,6 +75,7 @@ def compute_Gamma_L(freq, load_std, open_std, short_std):
         {'load', 'open', 'short'}
     """
 
+    from debug.debug_utils import plot_gamma
     out = {}
 
     # LOAD
@@ -70,12 +83,15 @@ def compute_Gamma_L(freq, load_std, open_std, short_std):
         raise NotImplementedError("Solo se soporta fixed_load por ahora")
 
     out['load'] = gamma_load(freq, load_std['model']['params'])
+    plot_gamma(freq, out['load'], 'LOAD')
 
     # OPEN
     out['open'] = gamma_open(freq, open_std['model']['params'])
+    plot_gamma(freq, out['open'], 'OPEN')
 
     # SHORT
     out['short'] = gamma_short(freq, short_std['model']['params'])
+    plot_gamma(freq, out['short'], 'SHORT')
 
     return out
 
@@ -88,6 +104,7 @@ def gamma_load(freq, params):
     ZL = float(params.get('ZL', 50.0)) if params.get('ZL') else 50.0
 
     Gamma = (ZL - Z0) / (ZL + Z0)
+
     return Gamma * np.ones_like(freq, dtype=complex)
 
 

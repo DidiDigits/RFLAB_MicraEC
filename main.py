@@ -55,9 +55,7 @@ def main():
             freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2
         )
 
-        #Debug
         plot_error_parameters(freq, error_params_p1, error_params_p2)
-    
 
         # Step 7: Perform transmission analysis, calculate transmission tracking
         perform_transmission_analysis(freq, error_params_p1, error_params_p2)

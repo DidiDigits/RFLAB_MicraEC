@@ -191,3 +191,40 @@ def plot_detT(T_thru, freq):
     plt.grid()
     plt.tight_layout()
     input("\nPresione Enter para continuar...")
+
+def plot_tau(freq, tau):
+    plt.figure()
+    plt.plot(freq/1e9, tau*1e9)
+    plt.ylabel('Tau [ns]')
+    plt.xlabel('Frecuencia [GHz]')
+    plt.grid()
+    plt.tight_layout()
+    input("\nPresione Enter para continuar...")
+
+def plot_gamma(freq, gamma, tag=None):
+    if isinstance(gamma, dict):
+        if tag is None:
+            if len(gamma) != 1:
+                raise ValueError("tag must be provided when gamma has multiple entries")
+            tag, gamma = next(iter(gamma.items()))
+        else:
+            if tag not in gamma:
+                raise KeyError(f"tag '{tag}' not found in gamma")
+            gamma = gamma[tag]
+
+    plt.figure()
+    if tag:
+        plt.suptitle(f"Gamma - {tag}")
+    plt.subplot(2,1,1)
+    mag = np.abs(gamma)
+    mag = np.maximum(mag, np.finfo(float).tiny)
+    plt.plot(freq/1e9, 20*np.log10(mag))
+    plt.ylabel('|Gamma| [dB]')
+    plt.grid()
+    plt.subplot(2,1,2)
+    plt.plot(freq/1e9, (np.angle(gamma)*180/np.pi))
+    plt.ylabel('∠Gamma [deg]')
+    plt.xlabel('Frecuencia [GHz]')
+    plt.grid()
+    plt.tight_layout()
+    input("\nPresione Enter para continuar...")

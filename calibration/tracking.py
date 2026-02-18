@@ -32,34 +32,24 @@ def estimate_transmission_tracking(T_M, T_XA, T_XB, freq):
     S21_p = alpha_p / X[:, 1, 1]
     S21_m = alpha_m / X[:, 1, 1]
 
+    # Encontrar la rama física correcta usando la fase de S21
+    sign = choose_alpha_sign(freq, S21_p, S21_m)
+    
+    if sign == +1:
+        print("\n✓ Se selecciona la rama con alpha positivo")
+        S21_thru = S21_p
+    else:
+        print("\n✓ Se selecciona la rama con alpha negativo")
+        S21_thru = S21_m
+
     #Debug Plot S21
     from debug.debug_utils import plot_S21n
-    plot_S21n(freq, S21_p)
-    plot_S21n(freq, S21_m)
+    plot_S21n(freq, S21_thru)
 
-    from transmission import compute_group_delay
-
-    gd_p = compute_group_delay(freq, S21_p)
-    gd_m = compute_group_delay(freq, S21_m)
-
-    print("Group Delay (p) statistics:")
-    print(f"Mean     : {np.mean(gd_p)*1e12:.3f} ps")
-    print(f"Median   : {np.median(gd_p)*1e12:.3f} ps")
-    print(f"Min      : {np.min(gd_p)*1e12:.3f} ps")
-    print(f"Max      : {np.max(gd_p)*1e12:.3f} ps")
-    print(f"Std Dev  : {np.std(gd_p)*1e12:.3f} ps")
-
-    print("Group Delay (m) statistics:")
-    print(f"Mean     : {np.mean(gd_m)*1e12:.3f} ps")
-    print(f"Median   : {np.median(gd_m)*1e12:.3f} ps")
-    print(f"Min      : {np.min(gd_m)*1e12:.3f} ps")
-    print(f"Max      : {np.max(gd_m)*1e12:.3f} ps")
-    print(f"Std Dev  : {np.std(gd_m)*1e12:.3f} ps")
-
-
-
-
-
+    return {
+        'alpha': alpha_p if sign == +1 else alpha_m,
+        'S21_thru': S21_thru
+    }
 
 def compute_alpha(T_M, T_XA, T_XB):
     """
@@ -84,6 +74,21 @@ def compute_alpha(T_M, T_XA, T_XB):
     print(alpha_minus)
 
     return alpha_plus, alpha_minus
+
+def choose_alpha_sign(freq, S21_plus, S21_minus, N=20):
+    # Tomamos las primeras N frecuencias
+    phase_plus  = np.angle(S21_plus[:N])
+    phase_minus = np.angle(S21_minus[:N])
+
+    mean_plus  = np.mean(phase_plus)
+    mean_minus = np.mean(phase_minus)
+
+    # Elegimos la que esté más cerca de 0 rad
+    if abs(mean_plus) < abs(mean_minus):
+        return +1
+    else:
+        return -1
+
 
 
 def compute_X_matrix(T_M, T_XA, T_XB):
