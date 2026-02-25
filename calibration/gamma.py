@@ -74,6 +74,7 @@ def compute_Gamma_L(freq, load_std, open_std, short_std):
     dict
         {'load', 'open', 'short'}
     """
+    print (load_std), print(open_std), print(short_std)
 
     from debug.debug_utils import plot_gamma
     out = {}
@@ -110,46 +111,88 @@ def gamma_load(freq, params):
 
 def gamma_open(freq, params):
     """
-    Gamma_L para OPEN con modelo capacitivo
+    Γ del OPEN estándar 85052D
+    freq en Hz
     """
-
     def to_float(val, default=0.0):
-        if val is None:
-            return default
-        return float(val)
+        return default if val is None else float(val)
 
+    # ---- Modelo capacitivo ----
     C0 = to_float(params.get('C0'))
     C1 = to_float(params.get('C1'))
     C2 = to_float(params.get('C2'))
     C3 = to_float(params.get('C3'))
-    Z0 = to_float(params.get('offset_z0'), 50.0)
 
-    w = 2 * np.pi * freq
-    C = C0 + C1 * freq + C2 * freq**2 + C3 * freq**3
+    # ---- Offset ----
+    Z0    = to_float(params.get('offset_z0'), 50.0)
+    delay = to_float(params.get('offset_delay'))     # segundos
+    loss  = to_float(params.get('offset_loss'))      # GΩ/s  (IMPORTANTE)
 
-    # Evitar división por cero
-    Z = np.where(C != 0, 1 / (1j * w * C), 1e20)
-    return (Z - Z0) / (Z + Z0)
+    w = 2*np.pi*freq
 
+    # Capacitancia dependiente de frecuencia
+    C = C0 + C1*freq + C2*freq**2 + C3*freq**3
+
+    # Impedancia en la punta
+    Zc = np.where(C != 0, 1/(1j*w*C), 1e20)
+
+    # Γ en la punta
+    Gamma_L = (Zc - Z0) / (Zc + Z0)
+
+    # ---- Modelo de propagación ----
+    # alpha(f) proporcional a sqrt(f)
+    alpha = (loss * delay / (2*Z0)) * np.sqrt(freq / 1e9)
+    # beta(f)
+    beta = w * delay
+    # gamma(f)
+    gamma = alpha + 1j*beta
+    # Ida y vuelta
+    Gamma_in = Gamma_L * np.exp(-2 * gamma)
+    return Gamma_in
 
 def gamma_short(freq, params):
     """
-    Gamma_L para SHORT con modelo inductivo
+    Γ del SHORT estándar 85052D
+    freq en Hz
     """
 
     def to_float(val, default=0.0):
-        if val is None:
-            return default
-        return float(val)
+        return default if val is None else float(val)
 
+    # ---- Modelo inductivo ----
     L0 = to_float(params.get('L0'))
     L1 = to_float(params.get('L1'))
     L2 = to_float(params.get('L2'))
     L3 = to_float(params.get('L3'))
-    Z0 = to_float(params.get('offset_z0'), 50.0)
 
-    w = 2 * np.pi * freq
-    L = L0 + L1 * freq + L2 * freq**2 + L3 * freq**3
+    # ---- Offset ----
+    Z0    = to_float(params.get('offset_z0'), 50.0)
+    delay = to_float(params.get('offset_delay'))      # segundos
+    loss  = to_float(params.get('offset_loss'))       # GΩ/s  (NO dB)
 
-    Z = 1j * w * L
-    return (Z - Z0) / (Z + Z0)
+    w = 2*np.pi*freq
+
+    # Inductancia dependiente de frecuencia
+    L = L0 + L1*freq + L2*freq**2 + L3*freq**3
+
+    # Impedancia en la punta
+    Zl = 1j*w*L
+
+    # Γ en la punta
+    Gamma_L = (Zl - Z0) / (Zl + Z0)
+
+    # ---- Modelo de propagación correcto ----
+
+    # alpha(f) ∝ sqrt(f)
+    alpha = (loss * delay / (2*Z0)) * np.sqrt(freq / 1e9)
+
+    # beta(f)
+    beta = w * delay
+
+    # gamma(f)
+    gamma = alpha + 1j*beta
+
+    # Ida y vuelta
+    Gamma_in = Gamma_L * np.exp(-2 * gamma)
+
+    return Gamma_in
