@@ -6,8 +6,7 @@ using Short, Open, and Load standards.
 
 import numpy as np
 
-
-def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
+def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict, verbose=False):
     """
     Estima e00(f), e10e01(f), e11(f) punto a punto en frecuencia
     usando estándares SHORT, OPEN y LOAD.
@@ -18,6 +17,8 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
         {'short': array, 'open': array, 'load': array}
     gamma_L_dict : dict
         {'short': array, 'open': array, 'load': array}
+    verbose : bool
+        Si True, imprime diagnósticos detallados
 
     Returns
     -------
@@ -26,7 +27,6 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
     e11 : np.ndarray (complex)
     """
 
-    keys = ['short', 'open', 'load']
     Nf = len(gamma_in_dict['short'])
 
     e00 = np.zeros(Nf, dtype=complex)
@@ -56,23 +56,33 @@ def estimate_error_box_SOL(gamma_in_dict, gamma_L_dict):
              gamma_L_dict['load'][k] * gamma_in_dict['load'][k]],
         ], dtype=complex)
 
-        # Solve 3x3 system with regularization for singular matrices
+        # Normalize columns ONLY (no rows)
+        col_norms = np.linalg.norm(X, axis=0)
+        col_norms[col_norms == 0] = 1.0
+        X_norm = X / col_norms
+        
+        # Solve 3x3 system
         try:
-            cond_num = np.linalg.cond(X)
-            if cond_num > 1e12:
-                print(f"Warning: Frequency index {k} - Condition number {cond_num:.2e} (ill-conditioned)")
-                # Use least squares instead of direct solve
-                a0, a1, a2 = np.linalg.lstsq(X, y, rcond=None)[0]
+            cond_num = np.linalg.cond(X_norm)
+            
+            if cond_num > 1e10:
+                if verbose:
+                    print(f"Index {k}: cond={cond_num:.2e}, using SVD-based lstsq")
+                a_norm = np.linalg.lstsq(X_norm, y, rcond=None)[0]
             else:
-                a0, a1, a2 = np.linalg.solve(X, y)
+                a_norm = np.linalg.solve(X_norm, y)
+                
         except np.linalg.LinAlgError:
-            print(f"Warning: Frequency index {k} - Singular matrix detected, using least squares")
-            # Use least squares for singular matrices
-            a0, a1, a2 = np.linalg.lstsq(X, y, rcond=None)[0]
+            if verbose:
+                print(f"Index {k}: Singular matrix, forcing SVD lstsq")
+            a_norm = np.linalg.lstsq(X_norm, y, rcond=None)[0]
 
-        e00[k] = a0
-        e11[k] = a2
-        e10e01[k] = a1 + a0 * a2
+        # Denormalize solution (simple)
+        a = a_norm / col_norms
+
+        e00[k] = a[0]
+        e11[k] = a[2]
+        e10e01[k] = a[1] + a[0] * a[2]
 
     return e00, e10e01, e11
 
