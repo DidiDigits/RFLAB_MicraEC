@@ -19,7 +19,7 @@ def validate_frequency_vectors(freq_p1, freq_p2):
         )
 
 
-def calculate_error_parameters(freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2):
+def calculate_error_parameters(freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2, zref):
     """Calculate SOL error parameters for both ports.
 
     Returns
@@ -30,10 +30,10 @@ def calculate_error_parameters(freq, gamma_in_p1, gamma_in_p2, standards_p1, sta
     print("\nCalculando estándares Gamma_L teóricos...")
 
     gamma_l_p1 = compute_Gamma_L(
-        freq, standards_p1['load'], standards_p1['open'], standards_p1['short']
+        freq, standards_p1['load'], standards_p1['open'], standards_p1['short'], zref
     )
     gamma_l_p2 = compute_Gamma_L(
-        freq, standards_p2['load'], standards_p2['open'], standards_p2['short']
+        freq, standards_p2['load'], standards_p2['open'], standards_p2['short'], zref
     )
 
     print("Calculando parámetros de error (SOL)...")

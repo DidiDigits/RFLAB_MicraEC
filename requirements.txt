@@ -1,0 +1,5 @@
+# Requirements for RFLAB_MicraEC
+# Detected from project imports: numpy, matplotlib, scikit-rf
+numpy
+matplotlib
+scikit-rf

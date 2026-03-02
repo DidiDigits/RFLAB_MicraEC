@@ -35,8 +35,9 @@ def main():
         # Step 1: Get port configuration
         sex_p1, sex_p2 = get_port_configuration()
 
-        # Step 2: Load and validate calibration kit
+        # Step 2: Load and validate calibration kit get Z_ref
         cal_kit_raw, standards = load_and_validate_calkit()
+        zref = float(cal_kit_raw['connectors'][0]['z0'])   # '50' (string)
 
         # Step 3: Select standards for both ports
         standards_p1 = select_standards_for_port(standards, sex_p1, port_num=1)
@@ -52,7 +53,7 @@ def main():
 
         # Step 6: Calculate error parameters (e00, e11, e10*e01 for Port 1 and e33, e22, e23*e32 for Port 2)
         error_params_p1, error_params_p2 = calculate_error_parameters(
-            freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2
+            freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2, zref,
         )
 
         plot_error_parameters(freq, error_params_p1, error_params_p2)
