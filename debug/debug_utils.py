@@ -228,3 +228,13 @@ def plot_gamma(freq, gamma, tag=None):
     plt.grid()
     plt.tight_layout()
     input("\nPresione Enter para continuar...")
+
+def plot_gamma_in(freq, gamma_in, puerto):
+    plt.figure()
+    plt.plot(freq, 20 * np.log10(np.abs(gamma_in)), label=f"S{puerto}{puerto} medido")
+    plt.title(f"Medición S{puerto}{puerto} (Gamma_in)")
+    plt.xlabel("Frecuencia (Hz)")
+    plt.ylabel("Magnitud (dB)")
+    plt.grid()  
+    # Pause to view the plots
+    input("\nPresione Enter para continuar...")

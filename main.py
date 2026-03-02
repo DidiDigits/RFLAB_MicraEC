@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from calibration.loader import load_and_validate_calkit
-from calibration.measurements import load_port_Gamma_in
+from calibration.loader import load_port_Gamma_in
 from calibration.calculator import validate_frequency_vectors, calculate_error_parameters
 from ui.port_config import get_port_configuration
 from ui.standard_selection import select_standards_for_port

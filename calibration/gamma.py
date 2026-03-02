@@ -37,17 +37,6 @@ def read_gamma_in(s2p_file, puerto):
 
     freq = ntwk.f
     S = ntwk.s
-
-    #Debug
-    plt.figure()
-    plt.plot(freq, 20 * np.log10(np.abs(S[:, puerto-1, puerto-1])), label=f"S{puerto}{puerto} medido")
-    plt.title(f"Medición S{puerto}{puerto} (Gamma_in)")
-    plt.xlabel("Frecuencia (Hz)")
-    plt.ylabel("Magnitud (dB)")
-    plt.grid()  
-    # Pause to view the plots
-    input("\nPresione Enter para continuar...")
-
     idx = puerto - 1
     gamma_in = S[:, idx, idx]
 
@@ -76,7 +65,7 @@ def compute_Gamma_L(freq, load_std, open_std, short_std):
     """
     print (load_std), print(open_std), print(short_std)
 
-    from debug.debug_utils import plot_gamma
+    #from debug.debug_utils import plot_gamma
     out = {}
 
     # LOAD
@@ -84,15 +73,15 @@ def compute_Gamma_L(freq, load_std, open_std, short_std):
         raise NotImplementedError("Solo se soporta fixed_load por ahora")
 
     out['load'] = gamma_load(freq, load_std['model']['params'])
-    plot_gamma(freq, out['load'], 'LOAD')
+    #plot_gamma(freq, out['load'], 'LOAD')
 
     # OPEN
     out['open'] = gamma_open(freq, open_std['model']['params'])
-    plot_gamma(freq, out['open'], 'OPEN')
+    #plot_gamma(freq, out['open'], 'OPEN')
 
     # SHORT
     out['short'] = gamma_short(freq, short_std['model']['params'])
-    plot_gamma(freq, out['short'], 'SHORT')
+    #plot_gamma(freq, out['short'], 'SHORT')
 
     return out
 
@@ -123,10 +112,16 @@ def gamma_open(freq, params):
     C2 = to_float(params.get('C2'))
     C3 = to_float(params.get('C3'))
 
+    #[DEBUG]
+    print(f"Parametros OPEN: C0={C0}, C1={C1}, C2={C2}, C3={C3}")
+
     # ---- Offset ----
     Z0    = to_float(params.get('offset_z0'), 50.0)
     delay = to_float(params.get('offset_delay'))     # segundos
     loss  = to_float(params.get('offset_loss'))      # GΩ/s  (IMPORTANTE)
+
+    #DEBUG
+    print(f"Offset OPEN: Z0={Z0}, delay={delay}, loss={loss}")
 
     w = 2*np.pi*freq
 
@@ -165,10 +160,15 @@ def gamma_short(freq, params):
     L2 = to_float(params.get('L2'))
     L3 = to_float(params.get('L3'))
 
+    #[DEBUG]
+    print(f"Parametros SHORT: L0={L0}, L1={L1}, L2={L2}, L3={L3}")
+
     # ---- Offset ----
     Z0    = to_float(params.get('offset_z0'), 50.0)
     delay = to_float(params.get('offset_delay'))      # segundos
     loss  = to_float(params.get('offset_loss'))       # GΩ/s  (NO dB)
+    #[DEBUG]
+    print(f"Offset SHORT: Z0={Z0}, delay={delay}, loss={loss}")
 
     w = 2*np.pi*freq
 

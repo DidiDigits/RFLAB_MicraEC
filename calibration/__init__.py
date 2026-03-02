@@ -1,7 +1,7 @@
 """Calibration package."""
 
 from .loader import load_and_validate_calkit
-from .measurements import load_port_Gamma_in
+from .loader import load_port_Gamma_in
 from .calculator import validate_frequency_vectors, calculate_error_parameters
 from .error_box import estimate_error_box_SOL, build_T_XA, build_T_XB
 from .gamma import read_gamma_in, compute_Gamma_L
