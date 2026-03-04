@@ -1,9 +1,11 @@
 import time
 import numpy as np
+import os
+import skrf as rf
 
 from calibration.calkit_utils import Parse_calkit, normalize_standards
 from calibration.gamma import read_gamma_in
-from ui.file_dialogs import select_calkit, select_s2p
+from ui.file_dialogs import select_calkit, select_s2p, select_s2p_files
 
 
 def load_and_validate_calkit():
@@ -119,3 +121,59 @@ def load_port_Gamma_in(port_num):
             'gamma_load': datos_Gamma_in['LOAD']['gamma'],
             'puerto_detectado': puerto_short,
         }
+
+
+
+def load_and_validate_measurement_s2p(freq):
+    """Carga y valida contra frecuencia los archivos de medición a corregir.
+
+    Solicita al usuario seleccionar archivos S2P de mediciones a corregir.
+    Valida que los archivos tengan vectores de frecuencia idénticos.
+    Repite si la validación falla.
+
+    Retorna
+    -------
+    list of dict
+        Lista de diccionarios, cada uno con claves:
+        - 'filename': nombre del archivo
+        - 'freq': vector de frecuencia (Hz)
+        - 'S11', 'S12', 'S21', 'S22'
+    """
+
+    freq = np.asarray(freq)
+
+    while True:
+
+        files = select_s2p_files("Selecciona archivos S2P")
+
+        measurements = []
+        mismatch = []
+
+        for f in files:
+
+            ntwk = rf.Network(f)
+            freq_file = ntwk.f
+
+            # Validación del vector de frecuencia
+            if not np.allclose(freq_file, freq, atol=1):
+                mismatch.append(os.path.basename(f))
+
+            s = ntwk.s
+
+            measurements.append({
+                "filename": os.path.basename(f),
+                "S11": s[:, 0, 0],
+                "S12": s[:, 0, 1],
+                "S21": s[:, 1, 0],
+                "S22": s[:, 1, 1],
+            })
+
+        if mismatch:
+            print("\n⚠️ Error: Los siguientes archivos no tienen el mismo vector de frecuencia:\n")
+            for m in mismatch:
+                print(" -", m)
+
+            print("\nSelecciona nuevamente los archivos.\n")
+            continue
+
+        return measurements

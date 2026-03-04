@@ -5,16 +5,14 @@ It guides users through calibration kit selection, standard selection, and error
 """
 
 import traceback
-import numpy as np
-import matplotlib.pyplot as plt
 
 from calibration.loader import load_and_validate_calkit
 from calibration.loader import load_port_Gamma_in
 from calibration.calculator import validate_frequency_vectors, calculate_error_parameters
-from ui.port_config import get_port_configuration
+from calibration.transmission import find_transmission_tracking
 from ui.standard_selection import select_standards_for_port
-from analysis.transmission import perform_transmission_analysis
-from debug.debug_utils import plot_error_parameters
+from ui.file_dialogs import select_output_folder
+from correction.correct_measure import correct_measure_s2p, save_corrected_s2p
 
 
 def main():
@@ -57,15 +55,25 @@ def main():
         error_params_p1, error_params_p2 = calculate_error_parameters(
             freq, gamma_in_p1, gamma_in_p2, standards_p1, standards_p2, zref,
         )
+        TXA = error_params_p1['T_XA']
+        TXB = error_params_p2['T_XB']
+        # plot_error_parameters(freq, error_params_p1, error_params_p2)
 
-        plot_error_parameters(freq, error_params_p1, error_params_p2)
+        # Step 7: Find transmission tracking (alpha)
+        alpha = find_transmission_tracking(freq, error_params_p1, error_params_p2)
 
-        # Step 7: Perform transmission analysis, calculate transmission tracking
-        perform_transmission_analysis(freq, error_params_p1, error_params_p2)
+        print("¡Calibración completada exitosamente!")
 
-        print("\n" + "="*50)
-        print("✓ ¡Calibración completada exitosamente!")
-        print("="*50)
+        # Step 8: Apply error correction to measurements and save
+        corrected = correct_measure_s2p(TXA, TXB, freq, alpha)
+        output_dir = select_output_folder()
+        save_corrected_s2p(corrected, output_dir)
+
+        print("\nMediciones corregidas guardadas correctamente.")
+
+
+
+
 
     except Exception as e:
         print(f"\nError fatal: {e}")

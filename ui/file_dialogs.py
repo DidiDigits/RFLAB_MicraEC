@@ -3,66 +3,114 @@ from tkinter import filedialog
 
 
 def _select_file(title, filetypes):
-	root = tk.Tk()
-	root.withdraw()
-	root.attributes("-topmost", True)
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
 
-	file_path = filedialog.askopenfilename(
-		title=title,
-		filetypes=filetypes
-	)
+    file_path = filedialog.askopenfilename(
+        title=title,
+        filetypes=filetypes,
+    )
 
-	root.destroy()
+    root.destroy()
 
-	if not file_path:
-		raise RuntimeError("No se seleccionó ningún archivo")
+    if not file_path:
+        raise RuntimeError("No se seleccionó ningún archivo")
 
-	return file_path
+    return file_path
 
 
 def select_s2p(title):
-	"""Open file dialog to select a Touchstone S2P file.
+    """Open file dialog to select a Touchstone S2P file.
 
-	Parameters
-	----------
-	title : str
-		Dialog window title
+    Parameters
+    ----------
+    title : str
+        Dialog window title
 
-	Returns
-	-------
-	str
-		Full path to selected file
+    Returns
+    -------
+    str
+        Full path to selected file
 
-	Raises
-	------
-	RuntimeError
-		If user cancels the file dialog
-	"""
-	return _select_file(
-		title=title,
-		filetypes=[("Touchstone files", "*.s2p"), ("All files", "*.*")]
-	)
+    Raises
+    ------
+    RuntimeError
+        If user cancels the file dialog
+    """
+    return _select_file(
+        title=title,
+        filetypes=[("Touchstone files", "*.s2p"), ("All files", "*.*")],
+    )
 
 
 def select_calkit(title="Seleccionar archivo de calibración"):
-	"""Open file dialog to select a calibration kit (.xkt) file.
+    """Open file dialog to select a calibration kit (.xkt) file.
 
-	Parameters
-	----------
-	title : str
-		Dialog window title
+    Parameters
+    ----------
+    title : str
+        Dialog window title
 
-	Returns
-	-------
-	str
-		Full path to selected file
+    Returns
+    -------
+    str
+        Full path to selected file
 
-	Raises
-	------
-	RuntimeError
-		If user cancels the file dialog
-	"""
-	return _select_file(
-		title=title,
-		filetypes=[("Archivos .xkt", "*.xkt"), ("All files", "*.*")]
-	)
+    Raises
+    ------
+    RuntimeError
+        If user cancels the file dialog
+    """
+    return _select_file(
+        title=title,
+        filetypes=[("Archivos .xkt", "*.xkt"), ("All files", "*.*")],
+    )
+
+
+def select_s2p_files(title):
+    """Open file dialog to select one or multiple Touchstone S2P files.
+
+    Parameters
+    ----------
+    title : str
+        Dialog window title
+
+    Returns
+    -------
+    list[str]
+        Full paths to selected files
+
+    Raises
+    ------
+    RuntimeError
+        If user cancels the file dialog
+    """
+    root = tk.Tk()
+    root.withdraw()
+
+    paths = filedialog.askopenfilenames(
+        title=title,
+        filetypes=[("Touchstone files", "*.s2p"), ("All files", "*.*")],
+    )
+
+    root.destroy()
+
+    if not paths:
+        raise RuntimeError("No files selected")
+
+    return list(paths)
+
+
+def select_output_folder():
+    root = tk.Tk()
+    root.withdraw()
+
+    folder = filedialog.askdirectory(title="Selecciona carpeta de salida")
+
+    root.destroy()
+
+    if not folder:
+        raise RuntimeError("No se seleccionó carpeta de salida")
+
+    return folder
