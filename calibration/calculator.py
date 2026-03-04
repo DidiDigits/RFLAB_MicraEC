@@ -2,6 +2,7 @@ import numpy as np
 
 from calibration.error_box import estimate_error_box_SOL, build_T_XA, build_T_XB
 from calibration.gamma import compute_Gamma_L
+from debug.debug_utils import plot_multiple_gamma_smith
 
 
 def validate_frequency_vectors(freq_p1, freq_p2):
@@ -32,6 +33,8 @@ def calculate_error_parameters(freq, gamma_in_p1, gamma_in_p2, standards_p1, sta
     gamma_l_p1 = compute_Gamma_L(
         freq, standards_p1['load'], standards_p1['open'], standards_p1['short'], zref
     )
+    plot_multiple_gamma_smith(freq, gamma_l_p1, puerto=1)
+    
     gamma_l_p2 = compute_Gamma_L(
         freq, standards_p2['load'], standards_p2['open'], standards_p2['short'], zref
     )

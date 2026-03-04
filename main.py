@@ -33,11 +33,13 @@ def main():
 
     try:
         # Step 1: Get port configuration
-        sex_p1, sex_p2 = get_port_configuration()
+        #sex_p1, sex_p2 = get_port_configuration()
+        sex_p1 = 'f'
+        sex_p2 = 'f'
 
-        # Step 2: Load and validate calibration kit get Z_ref
+        # Step 2: Load and validate calibration kit and get Z_ref
         cal_kit_raw, standards = load_and_validate_calkit()
-        zref = float(cal_kit_raw['connectors'][0]['z0'])   # '50' (string)
+        zref = float(cal_kit_raw['connectors'][0]['z0'])   # Impedancia de refrencia del kit (asumimos que es la misma para generos)
 
         # Step 3: Select standards for both ports
         standards_p1 = select_standards_for_port(standards, sex_p1, port_num=1)

@@ -14,18 +14,20 @@ def load_and_validate_calkit():
     tuple
         (cal_kit_raw, standards) - raw kit data and normalized standards list
     """
-    print("\nSeleccione el archivo .xkt con las definiciones de estándar")
-    time.sleep(0.5)
+    #print("\nSeleccione el archivo .xkt con las definiciones de estándar")
+    #time.sleep(0.5)
 
-    file_path = select_calkit("Seleccionar archivo de calibración")
+    #file_path = select_calkit("Seleccionar archivo de calibración")
+    file_path = "C:/Users/Diana/git/RFLAB_MicraEC/measurements/caltest/85052D.xkt"
 
-    print(f"Archivo seleccionado: {file_path}")
+    print(f"[DEBUG] Archivo seleccionado: {file_path}")
 
     cal_kit_raw = Parse_calkit(file_path)
     print(f"\nKit: {cal_kit_raw.get('label')}")
     print(f"Descripción: {cal_kit_raw.get('description')}")
 
     standards = normalize_standards(cal_kit_raw.get('standards'))
+    print(f"[DEBUG]\nEstándares disponibles en el kit:",standards)   
 
     if not isinstance(standards, list):
         raise TypeError(

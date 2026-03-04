@@ -6,6 +6,7 @@ import skrf as rf
 from calibration.tracking import estimate_transmission_tracking
 from analysis.comparison import compare_thru_S21
 from ui.file_dialogs import select_s2p
+from analysis.transmission import calculate_tau
 
 
 def read_thru_T_matrix(s2p_file):
@@ -40,20 +41,18 @@ def perform_transmission_analysis(freq, error_params_p1, error_params_p2):
         T_thru, error_params_p1['T_XA'], error_params_p2['T_XB'], freq
     )
 
-    #Debug
+    #[DEBUG]:
     #print(result_tracking)
 
     S21_thru = np.asarray(result_tracking['S21_thru'], dtype=complex)
-
-    # Debug: Calcular tau para el THRU estimado
-    from debug.debug_utils import plot_tau
-    from analysis.transmission import calculate_tau
+    
     tau = calculate_tau(freq, S21_thru)
     print(f"\n El retardo estimado: {tau} segundos")
 
+    # [DEBUG]: Graficar tau para el THRU estimado
+    #from debug.debug_utils import plot_tau
     #plot_tau(freq, tau)
-
-    print(f"\n✓ S21 del THRU estimado (primeros 5 puntos): {S21_thru[:5]}")
+    #print(f"\n✓ S21 del THRU estimado (primeros 5 puntos): {S21_thru[:5]}")
 
     print("\nSeleccione el THRU de referencia medido con PNA-X")
     time.sleep(0.5)

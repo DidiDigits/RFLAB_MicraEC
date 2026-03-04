@@ -67,11 +67,18 @@ def compute_alpha(T_M, T_XA, T_XB):
 
     ratio = det_TM / (det_TXA * det_TXB)
 
-    alpha_plus  = np.sqrt(ratio)
+    alpha = np.sqrt(ratio)
+
+    for k in range(1, len(alpha)):
+        if np.abs(alpha[k] - alpha[k-1]) > np.abs(-alpha[k] - alpha[k-1]):
+            alpha[k] = -alpha[k]
+
+    alpha_plus  = alpha
     alpha_minus = -alpha_plus
 
-    print(alpha_plus)
-    print(alpha_minus)
+    #[DEBUG]
+    #print(alpha_plus)
+    #print(alpha_minus)
 
     return alpha_plus, alpha_minus
 
